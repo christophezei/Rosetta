@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Rosetta</string>
+    <string name="hint_username"> Username</string>
+    <string name="hint_password"> Password</string>
+    <string name="text_view_login">Log In</string>
+    <string name="text_view_forgot_your_details">  Forgot your password?</string>
+    <string name="text_view_or">  OR</string>
+    <string name="text_view_fb_login">  Log In with Facebook</string>
+    <string name="text_view_dont_have_account">    Don\'t have an account?</string>
+    <string name="text_view_signup">    Sign up.</string>
+    <string name="text_view_help_signin">     Get help with signing in.</string>
+    <string name="title_activity_maps">Map</string>
+
+</resources>
