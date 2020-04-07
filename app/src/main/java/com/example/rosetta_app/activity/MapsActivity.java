@@ -6,12 +6,15 @@ import androidx.fragment.app.FragmentActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import in.galaxyofandroid.spinerdialog.OnSpinerItemClick;
+import in.galaxyofandroid.spinerdialog.SpinnerDialog;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.rosetta_app.R;
@@ -28,12 +31,16 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
+import java.util.ArrayList;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
-    private GoogleMap mMap;
     private Location currentLocation;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private static final int REQUEST_CODE = 101;
+
+    private ArrayList<String> languagesList = new ArrayList<>();
+    private SpinnerDialog spinnerDialog;
 
 
     private  boolean isRotate = false;
@@ -42,6 +49,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @BindView(R.id.fabManual)
     ExtendedFloatingActionButton fabManual;
+
+    @BindView(R.id.translateFrom)
+    EditText translateFrom;
+
+    @BindView(R.id.translateTo)
+    EditText translateTo;
 
 
 
@@ -56,6 +69,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         this.fetchLocation();
+        this.initLanguagesList();
+        this.translateFrom.setFocusable(false);
+        this.translateFrom.setClickable(true);
+        this.translateTo.setFocusable(false);
+        this.translateTo.setClickable(true);
+        spinnerDialog = new SpinnerDialog(MapsActivity.this, languagesList, "Select Language");
+    }
+
+    private void initLanguagesList() {
+        languagesList.add("French");
+        languagesList.add("English");
+        languagesList.add("Arabic");
+        languagesList.add("Spanish");
+        languagesList.add("Foulani");
+        languagesList.add("Russian");
     }
 
     private void fetchLocation() {
@@ -128,6 +156,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @OnClick(R.id.fabManual)
     public void fabManualOnClick(View v) {
+
+    }
+
+    @OnClick(R.id.translateFrom)
+    public void showLanguagesFrom() {
+        spinnerDialog.bindOnSpinerListener(new OnSpinerItemClick() {
+            @Override
+            public void onClick(String language, int position) {
+                translateFrom.setText(language);
+            }
+        });
+        spinnerDialog.showSpinerDialog();
+
+    }
+
+    @OnClick(R.id.translateTo)
+    public void showLanguagesTo() {
+        spinnerDialog.bindOnSpinerListener(new OnSpinerItemClick() {
+            @Override
+            public void onClick(String language, int position) {
+                translateTo.setText(language);
+            }
+        });
+        spinnerDialog.showSpinerDialog();
 
     }
 }
