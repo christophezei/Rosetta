@@ -1,6 +1,7 @@
 package com.example.rosetta_app.activity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 import butterknife.BindView;
@@ -12,6 +13,7 @@ import in.galaxyofandroid.spinerdialog.SpinnerDialog;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -32,6 +34,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -39,7 +46,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private FusedLocationProviderClient fusedLocationProviderClient;
     private static final int REQUEST_CODE = 101;
 
-    private ArrayList<String> languagesList = new ArrayList<>();
+    private Set<String> languages;
+    private ArrayList<String> languagesList = new ArrayList<String>();
     private SpinnerDialog spinnerDialog;
 
 
@@ -56,8 +64,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @BindView(R.id.translateTo)
     EditText translateTo;
 
-
-
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,13 +84,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         spinnerDialog = new SpinnerDialog(MapsActivity.this, languagesList, "Select Language");
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void initLanguagesList() {
-        languagesList.add("French");
-        languagesList.add("English");
-        languagesList.add("Arabic");
-        languagesList.add("Spanish");
-        languagesList.add("Foulani");
-        languagesList.add("Russian");
+        languages = Arrays.stream(Locale.getISOLanguages())
+                .map(Locale::new)
+                .map(Locale::getDisplayLanguage)
+                .collect(Collectors.toCollection(TreeSet::new));
+        languagesList.addAll(languages);
     }
 
     private void fetchLocation() {
@@ -94,16 +101,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return;
         }
         Task<Location> task = fusedLocationProviderClient.getLastLocation();
-        task.addOnSuccessListener(new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                if (location != null) {
-                    currentLocation = location;
-                    Toast.makeText(getApplicationContext(), currentLocation.getLatitude() + "" + currentLocation.getLongitude(), Toast.LENGTH_SHORT).show();
-                    SupportMapFragment supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-                    assert supportMapFragment != null;
-                    supportMapFragment.getMapAsync(MapsActivity.this);
-                }
+        task.addOnSuccessListener(location -> {
+            if (location != null) {
+                currentLocation = location;
+                SupportMapFragment supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+                assert supportMapFragment != null;
+                supportMapFragment.getMapAsync(MapsActivity.this);
             }
         });
     }
@@ -124,6 +127,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         googleMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 5));
         googleMap.addMarker(markerOptions);
+        googleMap.getUiSettings().setZoomControlsEnabled(false);
+        googleMap.getUiSettings().setZoomGesturesEnabled(false);
     }
 
     @Override
