@@ -11,6 +11,7 @@ import in.galaxyofandroid.spinerdialog.OnSpinerItemClick;
 import in.galaxyofandroid.spinerdialog.SpinnerDialog;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
@@ -35,6 +36,7 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
@@ -47,7 +49,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int REQUEST_CODE = 101;
 
     private Set<String> languages;
-    private ArrayList<String> languagesList = new ArrayList<String>();
+    private ArrayList<String> languagesList = new ArrayList<>();
+    private HashMap<String, String> countriesMap = new HashMap<>();
+
     private SpinnerDialog spinnerDialog;
 
 
@@ -77,6 +81,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         this.fetchLocation();
         this.initLanguagesList();
+        this.initCountriesMap();
         this.translateFrom.setFocusable(false);
         this.translateFrom.setClickable(true);
         this.translateTo.setFocusable(false);
@@ -90,7 +95,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .map(Locale::new)
                 .map(Locale::getDisplayLanguage)
                 .collect(Collectors.toCollection(TreeSet::new));
+
         languagesList.addAll(languages);
+    }
+
+    private void initCountriesMap(){
+        Locale[] locales = Locale.getAvailableLocales();
+        for(int i = 0 ; i <locales.length; i++){
+            countriesMap.put(locales[i].getLanguage(), locales[i].getCountry());
+        }
+    }
+
+
+    private String getCountryNameBasedOnSelectedLanguage(Locale language){
+        return countriesMap.get(language.getLanguage());
     }
 
     private void fetchLocation() {
@@ -156,7 +174,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
     @OnClick(R.id.fabAutomatic)
     public void fabAutoOnClick() {
-
+        Intent intent = new Intent(this, AutomaticMatchActivity.class);
+        startActivity(intent);
     }
 
     @OnClick(R.id.fabManual)
@@ -170,6 +189,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(String language, int position) {
                 translateFrom.setText(language);
+                Locale locale = new Locale(language);
+              //  Toast.makeText(getApplicationContext(),getCountryNameBasedOnSelectedLanguage(locale),Toast.LENGTH_SHORT).show();
             }
         });
         spinnerDialog.showSpinerDialog();
