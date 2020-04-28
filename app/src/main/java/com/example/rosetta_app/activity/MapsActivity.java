@@ -180,7 +180,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @OnClick(R.id.fabManual)
     public void fabManualOnClick(View v) {
-
+        Intent intent = new Intent(this, ManualMatchActivity.class);
+        startActivity(intent);
     }
 
     @OnClick(R.id.translateFrom)
