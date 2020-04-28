@@ -175,13 +175,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @OnClick(R.id.fabAutomatic)
     public void fabAutoOnClick() {
         Intent intent = new Intent(this, AutomaticMatchActivity.class);
-        startActivity(intent);
+        if(!translateFrom.getText().toString().isEmpty() && !translateTo.getText().toString().isEmpty()){
+            startActivity(intent);
+        }else{
+            Toast.makeText(getApplicationContext(),"Translate from and Translate to should not be empty",Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     @OnClick(R.id.fabManual)
     public void fabManualOnClick(View v) {
         Intent intent = new Intent(this, ManualMatchActivity.class);
-        startActivity(intent);
+        if(!translateFrom.getText().toString().isEmpty() && !translateTo.getText().toString().isEmpty()){
+            startActivity(intent);
+        }else{
+            Toast.makeText(getApplicationContext(),"Translate from and Translate to should not be empty",Toast.LENGTH_SHORT).show();
+        }
     }
 
     @OnClick(R.id.translateFrom)
